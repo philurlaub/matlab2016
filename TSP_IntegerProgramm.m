@@ -1,67 +1,62 @@
-function [ out ] = tspOptLin %(app)
+function [ tour, tourlenght processtime, solutiongab ] = tspOptLin(matrix)%(app)
 
 fprintf('############################################\n\n');
 
 tic;
 
-%          A  B  C  D  E  F  G  H  I
-%          1  2  3  4  5  6  7  8  9
-matrix = [ 0  7  6  0  0  0  6  4  0; % A 1
-           7  0  4  7  0  0  0  0  0; % B 2
-           6  4  0  3  5  0  0  0 10; % C 3
-           0  7  3  0  5 10  0  0  0; % D 4
-           0  0  5  5  0  5  8  0  7; % E 5
-           0  0  0 10  5  0  4  0  0; % F 6
-           6  0  0  0  8  4  0  3  2; % G 7
-           4  0  0  0  0  0  3  0  0; % H 8 
-           0  0 10  0  7  0  2  0  0  % I 9
-         ];
-     
-matrix = 
-     
-% fprintf('{');
-% for i=1:size(matrix, 1)
-%     fprintf('{');
-%     for j=1:size(matrix, 2)
-%         if matrix(i,j) ==  0
-%             fprintf('%i,', 0);
-%         else
-%             fprintf('%i,', matrix(i,j));
-%         end
-%     end
-%     fprintf('},');
-% end
-% fprintf('}');
-
+% %          A  B  C  D  E  F  G  H  I
+% %          1  2  3  4  5  6  7  8  9
+% matrix = [ 0  7  6  0  0  0  6  4  0; % A 1
+%            7  0  4  7  0  0  0  0  0; % B 2
+%            6  4  0  3  5  0  0  0 10; % C 3
+%            0  7  3  0  5 10  0  0  0; % D 4
+%            0  0  5  5  0  5  8  0  7; % E 5
+%            0  0  0 10  5  0  4  0  0; % F 6
+%            6  0  0  0  8  4  0  3  2; % G 7
+%            4  0  0  0  0  0  3  0  0; % H 8 
+%            0  0 10  0  7  0  2  0  0  % I 9
+%          ];
+%     
      
 NO_EDGE_MARKER =  0;
+DEBUG_OUTPUT = false;
 
 nStops = length(matrix);
 
-
+updateSalesmanPlot
 % x = linspace(-pi,pi,50);
 % y = 5*sin(x);
 % plot(ax,x,y)
 % 
-G = graph(matrix, 'upper', 'OmitSelfLoops');
-P = plot(G);
+%G = graph(matrix, 'upper', 'OmitSelfLoops');
+%P = plot(G);
 
+% all edges e.g. [from, to]
 idxs = nchoosek(1:length(matrix),2);
 
 idxs_clean = [];
 dist = [];
 
+size(idxs)
+
+% only edges that are valid - i.e. not zero
 for i=1:length(idxs)
     if matrix(idxs(i, 1), idxs(i,2)) ~= NO_EDGE_MARKER
         idxs_clean = [idxs_clean;idxs(i,:)];
         dist = [dist;matrix(idxs(i, 1), idxs(i,2))];
     end
-    fprintf('Kante von %i nach %i mit Länge: %i \n', idxs(i, 1), idxs(i,2), matrix(idxs(i, 1), idxs(i,2))); 
+    if DEBUG_OUTPUT
+        fprintf('Kante von %i nach %i mit Länge: %i \n', idxs(i, 1), idxs(i,2), matrix(idxs(i, 1), idxs(i,2))); 
+    end
 end
 
-fprintf('\n\n');
-for i=1:length(idxs_clean)
-    fprintf('Kante von %i nach %i mit Länge: %i \n', idxs_clean(i, 1), idxs_clean(i,2), dist(i));
+size(idxs_clean)
+
+if DEBUG_OUTPUT
+    fprintf('\n\n');
+    for i=1:length(idxs_clean)
+        fprintf('Kante von %i nach %i mit Länge: %i \n', idxs_clean(i, 1), idxs_clean(i,2), dist(i));
+    end
 end
 
 lendist = length(dist);
@@ -72,7 +67,6 @@ beq = nStops;
 Aeq = [Aeq;spalloc(nStops,length(idxs_clean),nStops*(nStops-1))]; % allocate a sparse matrix
 
 for ii = 1:nStops
-    
     whichIdxs = (idxs_clean == ii); % find the trips that include stop ii
     whichIdxs = sparse(sum(whichIdxs,2)); % include trips where ii is at either end
     Aeq(ii+1,:) = whichIdxs'; % include in the constraint matrix
@@ -88,6 +82,7 @@ opts = optimoptions('intlinprog','Display','off');
 [x_tsp,costopt,exitflag,output] = intlinprog(dist,intcon,[],[],Aeq,beq,lb,ub,opts);
 
 segments = find(x_tsp); % Get indices of lines on optimal path
+
 
 fprintf('\n\n');
 for i=1:length(idxs_clean)
@@ -135,15 +130,31 @@ end
 
 %app.printToGui('test');
 
-dist'*x_tsp
+fprintf('Tour:')
+
+
+% return the tour in output matrix tour
+tour = []; %spalloc(size(matrix, 1), 2, 2*size(matrix, 1));
+row = 1;
+for i = 1:size(x_tsp, 1)
+    if x_tsp(i) == 1
+        tour(row,:) = [idxs_clean(i, 1), idxs_clean(i, 2)];
+        row = row+1;
+        %fprintf(' %i -> %i \n', idxs_clean(i, 1), idxs_clean(i,2));
+    end
+end
+
+
+tourlenght = dist'*x_tsp;
+solutiongab = output.absolutegap;
+processtime = toc; %fprintf('%f sec.\n', toc);
 
 display('Lösungsqüte:');
 if (output.absolutegap == 0)
     fprintf('\t Lösung ist optimal \n');
 end
 
-fprintf('%f sec.\n', toc)
+%fprintf('%f sec.\n', toc)
 %app.labelExecutionTime.Text = sprintf('%fms', toc);
 
 end
-

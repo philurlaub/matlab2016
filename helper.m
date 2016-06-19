@@ -12,6 +12,9 @@ function message = helper
     assignin('base', 'getExampleMatrix1', @getExampleMatrix1);
     assignin('base', 'printMatrixAsGraph', @printMatrixAsGraph);
     assignin('base', 'checkMatrix', @checkMatrix);
+    assignin('base', 'makeMatrixSymmetric', @makeMatrixSymmetric);
+    assignin('base', 'drawTsp', @drawTsp);
+    assignin('base', 'matrixFromMetricCoordinates', @matrixFromMetricCoordinates);
 end
 
 %{
@@ -74,6 +77,55 @@ isValid = true;
     end
 
 end
+
+%{
+
+Make matrix symmetric 
+
+parameters:
+- inMatrix: matrix to mirrow
+- part: 'top' or 'bottom' - which side to mirrow
+
+returns:
+- outMatrix: symmetrix matrix
+
+%}
+function outMatrix=makeMatrixSymmetric(inMatrix, part)
+    outMatrix=inMatrix;
+    for i = 1:size(outMatrix, 1)
+        for j = 1:size(outMatrix, 2)
+            if i==j
+                outMatrix(i,j) = 0;
+            elseif strcmp(part,'bottom') && i<j
+                outMatrix(i,j) = outMatrix(j,i);
+            elseif strcmp(part,'top') && i>j
+                outMatrix(i,j) = outMatrix(j,i);
+            end
+        end
+    end
+end
+
+function drawTsp(tour, coordinates)
+    hold on;
+    scatter(coordinates(:,1), coordinates(:,2), '*');
+    labels = num2str((1:size(coordinates,1))','%d');    %'
+    text(coordinates(:,1), coordinates(:,2), labels, 'horizontal','left', 'vertical','bottom')
+    
+    for i=1:size(tour,1)
+        line([coordinates(tour(i, 1), 1), coordinates(tour(i, 2),1)],[coordinates(tour(i, 1), 2), coordinates(tour(i, 2),2)]);
+    end
+end
+
+
+function matrix=matrixFromMetricCoordinates(coordinates)
+    matrix = zeros(size(coordinates, 1));
+    
+    for i=1:size(coordinates, 1)
+        for j=1:size(coordinates, 1)
+            matrix(i,j) = sqrt( (coordinates(i,1)-coordinates(j,1))^2 + (coordinates(i,2)-coordinates(j,2))^2);
+        end
+    end 
+end 
 
 function printMatrixAsGraph(matrix)
 
