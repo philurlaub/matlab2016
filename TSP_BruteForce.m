@@ -1,4 +1,4 @@
-function [ tour ] = TSP_BruteForce( matrix )
+function [ tour, tourLength ] = TSP_BruteForce( matrix )
 %{
 BruteForce - exact solution 
 
@@ -7,8 +7,10 @@ parameters:
 edge between to nodes)
 
 returns:
-- tour: the best solution of the given 
+- tour: the best solution for the given matrix 
+- tourLength: length of the tour
 %}
+
 nodes=(2:size(matrix,1));
 permutations = perms(nodes);
 numOfPermutations = size(permutations, 1);
@@ -35,7 +37,6 @@ for (i = 1:numOfPermutations)
             isAllowed = false;
             break;
         end
-        
         from = to;
     end
     
@@ -55,10 +56,10 @@ for (i = 1:numOfPermutations)
             end
         else
           %disp('Not allowed');
-            isAllowed = false;
         end      
     end
 end
 
-optPermutation = [1 optPermutation 1]
-smallestDistance
+tour = [1 optPermutation 1]
+tourLength = smallestDistance
+end

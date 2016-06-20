@@ -1,4 +1,4 @@
-function [ tour ] = TSP_( matrix )
+function [ MSTedges, tour, tourLength ] = TSP_( matrix )
 %{
 christofides - heuristic (start method)
 
@@ -7,13 +7,13 @@ parameters:
 triangle inequality)
 
 returns:
+- MSTedges: edges of the graph which make the MST (minimum spanning tree)
 - tour: one solution of the Christofides-Algorithm for the given matrix 
-with n nodes
+- tourLength: lenght of the tour
+
 %}
 
-nodes = [1,2,3,4,5,6,7,8,9];
-
-helpDist = distances;
+helpDist = matrix;
 
 %step 1: Minimum spanning tree (Prim Algorithm)
 MSTedges=[];
@@ -39,10 +39,6 @@ while(size(matrix,1) ~= length(MSTnodes))
     MSTedges = [MSTedges; (minEdge)];
     helpDist(:, minEdge(2)) = 0;
 end
-
-%output
-MSTnodes
-MSTedges
 
 
 %step 2: Creating a complete Graph of all nodes with an odd node level 
@@ -83,18 +79,15 @@ for(r=1:size(oddNodePerms, 1))
 	end
 end
 
-
-
 %step 3: add minimum cost matching to MST -> any circle of this Graph
 minCostMatch = oddNodePerms(minPermutation,:);
+edges = MSTedges;
 for(a = 1: 2 : length(minCostMatch))
-	MSTedges = [MSTedges; [minCostMatch(a) minCostMatch(a+1)]];
+	edges = [edges; [minCostMatch(a) minCostMatch(a+1)]];
 end
 
 % any circle (Euler Tour) -> starting with startNode;
 % add only nodes which aren't visited yet
-
-edges = MSTedges;
 tour = 1;
 element = 1;
 while(length(tour) ~= size(matrix,1))
@@ -123,10 +116,6 @@ tourLength = 0;
 for(j=1:length(tour)-1)
     tourLength = tourLength + distances(tour(j), tour(j+1))
 end
-
-%output
-tour
-tourLength
 
 end
 
