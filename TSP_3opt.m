@@ -1,4 +1,4 @@
-function [ tour ] = threeOpt( tour, matrix )
+function [ tour, tourLength] = threeOpt( tour, matrix )
 %{ 
 3 opt - heuristic (improving method)
 
@@ -8,6 +8,8 @@ parameters:
 
 returns:
 - tour: a 3-opt tour
+- tourLength: length of the 3-opt tour
+
 %}   
 
 %number of nodes
@@ -60,6 +62,13 @@ while(newIteration)
         %Rotation
         tour = [tour(n) tour(1:n)];
     end
+end
+
+tour = [tour(n) tour(1:n)];
+
+tourLength = 0;
+for(j=1:length(tour)-1)
+    tourLength = tourLength + matrix(tour(j), tour(j+1))
 end
 
 end

@@ -54,7 +54,15 @@ function TSP_Gui2_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for TSP_Gui2
 handles.output = hObject;
-
+handles.matrix = [0 7 6 9 11 10 6 4 8;
+ 7 0 4 7 9 14 13 11 14;
+ 6 4 0 3 5 10 12 10 10;
+ 9 7 3 0 5 10 13 13 12;
+ 11 9 5 5 0 5 8 11 7;
+ 10 14 10 10 5 0 4 7 6;
+ 6 13 12 13 8 4 0 3 2;
+ 4 11 10 13 11 7 3 0 5;
+ 8 14 10 12 7 6 2 5 0];
 % Update handles structure
 guidata(hObject, handles);
 
@@ -101,6 +109,9 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+openvar(handles.matrix);
+guidata(hObject, handles);
+
 
 
 % --- Executes on button press in pushbutton2.
@@ -115,8 +126,68 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+s = get(handles.popupmenu1, 'String');      
+set(handles.edit1, 'String', sprintf('%s!',s{get(handles.popupmenu1, 'Value')}));
 
+switch (s{get(handles.popupmenu1, 'Value')})
+    case 'Brute Force'
+          [t, tl, p] = TSP_BruteForce(handles.matrix);
+                 
+          if(tl == -1)
+             text = get(handles.edit1, 'String');
+             errorMsg = 'No valid tour found!!!';
+             set(handles.edit1, 'String', sprintf('%s \n\n%s', text, errorMsg)); 
+          end
+          
+          set(handles.text5, 'String', sprintf('Execution time: %f', p));
+          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+    
+    case 'Integer Programming'
+        TSP_IntegerProgramm(app);
 
+    case 'Best Successor'
+          [t, tl, p] = TSP_BestSuccessor(handles.matrix);
+          
+          if(tl == -1)
+             text = get(handles.edit1, 'String');
+             errorMsg = 'No valid Tour found!!!';
+             set(handles.edit1, 'String', sprintf('%s \n\n%s', text, errorMsg)); 
+          end
+          
+          set(handles.text5, 'String', sprintf('Execution time: %f', p));
+          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+        
+    case 'Christofides'
+          [mst, oddEdges, t, tl, p] = TSP_Christofides(handles.matrix);
+          
+          if(tl == -1)
+             cs = get(handles.edit1, 'String');
+             errorMsg = 'Matrix does not satisfy the triangle inequality!!!';
+             set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, errorMsg)); 
+          end
+          set(handles.text5, 'String', sprintf('Execution time: %f', p));
+          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+          
+    case 'Opt2'
+          [t, tl, p] = TSP_2opt(handles.matrix);
+                 
+          set(handles.text5, 'String', sprintf('Execution time: %f', p));
+          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+          
+    case 'Opt3'
+          [t, tl, p] = TSP_3opt(handles.matrix);
+                 
+          set(handles.text5, 'String', sprintf('Execution time: %f', p));
+          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+    otherwise
+        printToGui(app, 'Error: please select a algorithm!');
+end
+guidata(hObject, handles);
 
 function edit1_Callback(hObject, eventdata, handles)
 % hObject    handle to edit1 (see GCBO)

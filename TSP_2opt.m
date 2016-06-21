@@ -1,4 +1,4 @@
-function [ tour ] = twoOpt( tour, matrix )
+function [ tour, tourLength ] = twoOpt( tour, matrix )
 %{ 
 2 opt - heuristic (improving method)
 
@@ -8,6 +8,8 @@ parameters:
 
 returns:
 - tour: a 2-opt tour
+- tourLength: length of the 2-opt tour
+
 %}   
 
 newIteration = true;
@@ -33,5 +35,11 @@ while(newIteration)
         end
     end
 end
+
+tourLength = 0;
+for(j=1:length(tour)-1)
+    tourLength = tourLength + matrix(tour(j), tour(j+1))
+end
+
 end
 
