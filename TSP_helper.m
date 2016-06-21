@@ -9,11 +9,11 @@ Helper class with useful funtions that can be used in any TSP algorithms
 %}
 function message = helper
     message='Import helper functions';
-    assignin('base', 'printMatrixAsGraph', @printMatrixAsGraph);
-    assignin('base', 'checkMatrix', @checkMatrix);
-    assignin('base', 'makeMatrixSymmetric', @makeMatrixSymmetric);
-    assignin('base', 'drawTsp', @drawTsp);
-    assignin('base', 'matrixFromMetricCoordinates', @matrixFromMetricCoordinates);
+    assignin('caller', 'printMatrixAsGraph', @printMatrixAsGraph);
+    assignin('caller', 'checkMatrix', @checkMatrix);
+    assignin('caller', 'makeMatrixSymmetric', @makeMatrixSymmetric);
+    assignin('caller', 'drawTsp', @drawTsp);
+    assignin('caller', 'matrixFromMetricCoordinates', @matrixFromMetricCoordinates);
 end
 
 %{
