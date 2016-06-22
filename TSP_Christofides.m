@@ -76,7 +76,7 @@ for(l=1:size(MSTedges, 1))
     nodeLevel(MSTedges(l, 2), MSTedges(l, 1)) = 1;
 end
 
-oddNodeLevel = 0;
+oddNodeLevel = [];
 for(k=1:size(nodeLevel, 1))
     oneNodeLevel = sum(nodeLevel(k,:));
 	if(mod(oneNodeLevel,2) ~= 0)
@@ -95,7 +95,7 @@ oddNodePerms = perms(oddNodeLevel);
 
 for(r = 1:size(oddNodePerms, 1))
 	sumOddNode = 0;
-	for(c = 1 : 2 : size(oddNodePerms, 2))
+	for(c = 1 : 2 : (size(oddNodePerms, 2)-1))
 		sumOddNode = sumOddNode + matrix(oddNodePerms(r,c), oddNodePerms(r,c+1));
 	end	
 	
@@ -111,7 +111,7 @@ oddNodeLevelEdges = [];
 minCostMatch = oddNodePerms(minPermutation,:);
 oddNodeLevelEdges = [];
 
-for(a = 1: 2 : length(minCostMatch))
+for(a = 1: 2 : length(minCostMatch)-1)
     oddNodeLevelEdges = [oddNodeLevelEdges; [minCostMatch(a) minCostMatch(a+1)]];
 	edges = [edges; [minCostMatch(a) minCostMatch(a+1)]];
 end

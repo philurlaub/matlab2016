@@ -54,15 +54,10 @@ function TSP_Gui2_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for TSP_Gui2
 handles.output = hObject;
-handles.matrix = [0 7 6 9 11 10 6 4 8;
- 7 0 4 7 9 14 13 11 14;
- 6 4 0 3 5 10 12 10 10;
- 9 7 3 0 5 10 13 13 12;
- 11 9 5 5 0 5 8 11 7;
- 10 14 10 10 5 0 4 7 6;
- 6 13 12 13 8 4 0 3 2;
- 4 11 10 13 11 7 3 0 5;
- 8 14 10 12 7 6 2 5 0];
+handles.matrix = [];
+
+handles.coordinates = [];
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -112,9 +107,20 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 [FileName,PathName] = uigetfile('*.mat','Select the mat-file');
 file = load(FileName)
 handles.matrix = cell2mat(struct2cell(file))
-set(handles.edit1, 'String', 'Data input finished!');
+set(handles.edit1, 'String', 'Matrix loaded!');
 guidata(hObject, handles);
 
+
+% --- Executes on button press in pushbutton4.
+function pushbutton4_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[FileName,PathName] = uigetfile('*.mat','Select the mat-file');
+file = load(FileName)
+handles.coordinates = cell2mat(struct2cell(file))
+set(handles.edit1, 'String', 'Coordinates loaded!');
+guidata(hObject, handles);
 
 
 % --- Executes on button press in pushbutton2.
@@ -143,20 +149,43 @@ end
 
 switch (alg{get(handles.popupmenu1, 'Value')})
     case 'Brute Force'
-          [t, tl, p] = TSP_BruteForce(handles.matrix);
-                 
-          if(tl == -1)
-             text = get(handles.edit1, 'String');
-             errorMsg = 'No valid tour found!!!';
-             set(handles.edit1, 'String', sprintf('%s \n\n%s', text, errorMsg)); 
+        % reset axes
+         cla(handles.axes1);
+         
+         if size(handles.matrix, 1) < 11
+           try
+               % run algorithm
+              [t, tl, p] = TSP_BruteForce(handles.matrix);
+
+              % Exception Handling: No valid tour
+              if(tl == -1)
+                 text = get(handles.edit1, 'String');
+                 errorMsg = 'No valid tour found!!!';
+                 set(handles.edit1, 'String', sprintf('%s \n\n%s', text, errorMsg)); 
+              end
+
+              %output
+              set(handles.text5, 'String', sprintf('Execution time: %f', p));
+              set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+              set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+
+              % draw Tour
+              tour=[];
+              for(f = 1 : length(t)-1)
+                  tour=[tour; t(f) t(f+1)];
+              end
+              drawTsp(tour, handles.coordinates, handles.axes1);
+              
+          catch 
+              warndlg('An Exception occured!');
           end
-          
-          set(handles.text5, 'String', sprintf('Execution time: %f', p));
-          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
-          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
-    
+        else
+            text = get(handles.edit1, 'String');
+            errorMsg = 'TSP is too big for the Brute Force Algorithm!!!';
+            set(handles.edit1, 'String', sprintf('%s \n\n%s', text, errorMsg));
+        end
     case 'Integer Programming'
-        
+         cla(handles.axes1);
         [tour, tourlenght, processtime, solutiongab] = TSP_IntegerProgramm(handles.matrix);
         tourString = getTourStringFromIntegerProgrammTour(tour);
         
@@ -165,96 +194,159 @@ switch (alg{get(handles.popupmenu1, 'Value')})
         set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', tourString)));
 
 
-        drawTsp(tour, example3_coordinates, handles.axes1);
+        drawTsp(tour, handles.coordinates, handles.axes1);
          
 
     case 'Best Successor'
+          % reset axes
+          cla(handles.axes1);
+          % run algorithm
           [t, tl, p] = TSP_BestSuccessor(handles.matrix);
           
+          % Exception Handling: No tour found
           if(tl == -1)
              text = get(handles.edit1, 'String');
              errorMsg = 'No valid Tour found!!!';
              set(handles.edit1, 'String', sprintf('%s \n\n%s', text, errorMsg)); 
           end
           
+          %output
           set(handles.text5, 'String', sprintf('Execution time: %f', p));
           set(handles.text6, 'String', sprintf('Tour length: %d', tl));
           set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
         
+          % draw Tour
+          tour=[];
+          for(f = 1 : length(t)-1)
+              tour=[tour; t(f) t(f+1)];
+          end
+          drawTsp(tour, handles.coordinates, handles.axes1);
+          
     case 'Christofides'
-      try
-          [mst, oddEdges, t, tl, p] = TSP_Christofides(handles.matrix);
-          
-          if(tl == -1)
-             cs = get(handles.edit1, 'String');
-             errorMsg = 'Matrix does not satisfy the triangle inequality!!!';
-             set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, errorMsg)); 
+        % reset axes;
+        cla(handles.axes1);
+      
+      % Exception Handling: To big TSPs
+      if size(handles.matrix, 1) < 15
+          try
+              % run algorithm
+              [mst, oddEdges, t, tl, p] = TSP_Christofides(handles.matrix);
+
+              % Exception Handling: triangle inequality
+              if(tl == -1)
+                 cs = get(handles.edit1, 'String');
+                 errorMsg = 'Matrix does not satisfy the triangle inequality!!!';
+                 set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, errorMsg)); 
+              end
+              
+              %output
+              set(handles.text5, 'String', sprintf('Execution time: %f', p));
+              set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+              set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+              
+              % draw Tour
+              tour=[];
+              for(f = 1 : length(t)-1)
+                  tour=[tour; t(f) t(f+1)];
+              end
+              drawTsp(tour, handles.coordinates, handles.axes1);
+              
+          catch 
+              warndlg('An Exception occured!');
           end
-          set(handles.text5, 'String', sprintf('Execution time: %f', p));
-          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
-          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
-      catch ex
-          msgText = getReport(ex);
-          w = warndlg(msgText);
+      else
+         text = get(handles.edit1, 'String');
+         errorMsg = 'TSP is too big for Christofides!!!';
+         set(handles.edit1, 'String', sprintf('%s \n\n%s', text, errorMsg));
       end
+      
     case 'Opt2'
-        
-           prompt = {'Enter Start Tour:'};
-           dlg_titel = 'Start Tour Input';
-           num_lines = 1;
-           input = inputdlg(prompt, dlg_titel, num_lines);
-           
-           if(~isempty(input{1}))
-              start = str2num(input{1});
-           else
-              start = TSP_BestSuccessor(handles.matrix);
-           end
-                     
-          [t, tl, p] = TSP_2opt(start, handles.matrix);
-          
-          cs = get(handles.edit1, 'String');
-          st = '';
-          if(tl == -1)
-              msg = 'Start tour includes to less or to much nodes!';
-              st = sprintf('Start Tour: %s\n\n%s', sprintf('%d ', start), msg);
-          else
-              st = sprintf('Start Tour: %s', sprintf('%d ', start));
-          end
-          set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, st));
-          
-          set(handles.text5, 'String', sprintf('Execution time: %f', p));
-          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
-          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+        % reset axes;
+       cla(handles.axes1);
+       
+       % Start Tour Dialog Window 
+       prompt = {'Enter Start Tour:'};
+       dlg_titel = 'Start Tour Input';
+       num_lines = 1;
+       input = inputdlg(prompt, dlg_titel, num_lines);
+
+       % Check if a Start TOur was given otherwise use best successor
+       % algorithmm to create a first solution
+       if(~isempty(input{1}))
+          start = str2num(input{1});
+       else
+          start = TSP_BestSuccessor(handles.matrix);
+       end
+
+       % run algorithm 
+      [t, tl, p] = TSP_2opt(start, handles.matrix);
+
+      cs = get(handles.edit1, 'String');
+      st = '';
+      % Check if given Start Tour has enough nodes
+      if(tl == -1)
+          msg = 'Start tour includes to less or to much nodes!';
+          st = sprintf('Start Tour: %s\n\n%s', sprintf('%d ', start), msg);
+      else
+          st = sprintf('Start Tour: %s', sprintf('%d ', start));
+      end
+      set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, st));
+
+      % output
+      set(handles.text5, 'String', sprintf('Execution time: %f', p));
+      set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+      set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+
+      % draw Tour
+      tour=[];
+      for(f = 1 : length(t)-1)
+          tour=[tour; t(f) t(f+1)];
+      end
+      drawTsp(tour, handles.coordinates, handles.axes1);
           
     case 'Opt3'
-        
-           prompt = {'Enter Start Tour:'};
-           dlg_titel = 'Start Tour Input';
-           num_lines = 1;
-           input = inputdlg(prompt, dlg_titel, num_lines);
-           
-           if(~isempty(input{1}))
-              start = str2num(input{1});
-           else
-              [start, a, c]  = TSP_BestSuccessor(handles.matrix);
-           end
-                    
-          [t, tl, p] = TSP_3opt(start, handles.matrix);
-          
-          cs = get(handles.edit1, 'String');
-          st = '';
-          if(tl == -1)
-              msg = 'Start tour includes to less or to much nodes!';
-              st = sprintf('Start Tour: %s\n\n%s', sprintf('%d ', start), msg);
-          else
-              st = sprintf('Start Tour: %s', sprintf('%d ', start));
-          end
-          set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, st));
-          
-           
-          set(handles.text5, 'String', sprintf('Execution time: %f', p));
-          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
-          set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+        % reset axes;
+       cla(handles.axes1);
+       
+       % Start Tour Dialog Window 
+       prompt = {'Enter Start Tour:'};
+       dlg_titel = 'Start Tour Input';
+       num_lines = 1;
+       input = inputdlg(prompt, dlg_titel, num_lines);
+
+       % Check if a Start TOur was given otherwise use best successor
+       % algorithmm to create a first solution
+       if(~isempty(input{1}))
+          start = str2num(input{1});
+       else
+          [start, a, c]  = TSP_BestSuccessor(handles.matrix);
+       end
+
+       % run algorithm
+      [t, tl, p] = TSP_3opt(start, handles.matrix);
+
+      cs = get(handles.edit1, 'String');
+      st = '';
+      % Check if given Start Tour has enough nodes
+      if(tl == -1)
+          msg = 'Start tour includes to less or to much nodes!';
+          st = sprintf('Start Tour: %s\n\n%s', sprintf('%d ', start), msg);
+      else
+          st = sprintf('Start Tour: %s', sprintf('%d ', start));
+      end
+      set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, st));
+
+      % output
+      set(handles.text5, 'String', sprintf('Execution time: %f', p));
+      set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+      set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+
+      % draw Tour
+      tour=[];
+      for(f = 1 : length(t)-1)
+          tour=[tour; t(f) t(f+1)];
+      end
+      drawTsp(tour, handles.coordinates, handles.axes1);
           
     case 'Run All'
           TSP_RunAll(handles.matrix, handles.edit1, handles.axes1);

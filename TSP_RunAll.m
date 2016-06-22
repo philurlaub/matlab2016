@@ -33,6 +33,20 @@ function [ output_args ] = TSP_RunAll( matrix, outputfield, axes )
         [t, tl, p] = TSP_BruteForce(matrix);
         processingTimes(end+1) = p;
         msg = sprintf('%s \n\n### 5) BruteForce: ###\n    Tour: %s\n    Tour length: %f\n    Processing time: %f', msg, mat2str(t), tl, p); 
+    else
+        msg = sprintf('%s \n\n### 5) BruteForce: ###\n    TSP is to big for Brute Force Algorithm!', msg); 
+    end 
+    
+    if size(matrix, 1) < 11
+        [mst, e, t, tl, p] = TSP_Christofides(matrix);
+        processingTimes(end+1) = p;
+        if(tl == -1)
+            msg = sprintf('%s \n\n### 6) Christofides: ###\n    Matrix does not satisfy the triangle inequality!', msg); 
+        else
+            msg = sprintf('%s \n\n### 6) Christofides: ###\n    Tour: %s\n    Tour length: %f\n    Processing time: %f', msg, mat2str(t), tl, p); 
+        end
+    else
+        msg = sprintf('%s \n\n### 6) Christofides: ###\n    TSP is to big for Christofides Algorithm!', msg); 
     end 
     
     bar(processingTimes);

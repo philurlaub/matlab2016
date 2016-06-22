@@ -16,6 +16,17 @@ returns:
 % start measuring the processing time
 tic
 
+M = 10e+06;
+% Relaxation - if there is no edge between two nodes, this edge get
+% expensiv costs, so if will not be taken
+for(r = 1:size(matrix,1))
+    for(c = 1:size(matrix,2))
+        if(r~=c && matrix(r,c)==0)
+            matrix(r,c) = M;
+        end
+    end
+end
+
 %number of nodes
 n = size(matrix,1);
 
