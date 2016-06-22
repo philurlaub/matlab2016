@@ -14,6 +14,7 @@ function message = helper
     assignin('caller', 'makeMatrixSymmetric', @makeMatrixSymmetric);
     assignin('caller', 'drawTsp', @drawTsp);
     assignin('caller', 'matrixFromMetricCoordinates', @matrixFromMetricCoordinates);
+    assignin('caller', 'getTourStringFromIntegerProgrammTour', @getTourStringFromIntegerProgrammTour);
 end
 
 %{
@@ -89,7 +90,7 @@ parameters:
                e.g. first row (x, y) coordinates of node 1
 
 %}
-function drawTsp(tour, coordinates)
+function drawTsp(tour, coordinates, axes)
     hold on;
     scatter(coordinates(:,1), coordinates(:,2), '*');
     labels = num2str((1:size(coordinates,1))','%d');    %'
@@ -122,4 +123,28 @@ function matrix=matrixFromMetricCoordinates(coordinates)
         end
     end 
 end 
+
+
+%{
+
+Get the tour order from edge list
+
+parameters:
+- tour: list of eges 
+               e.g.      1     2
+                         2     3
+                         3     1
+
+returns: 
+- tour_corret_order: row of points to visit e.g. 1 2 3 1
+
+%}
+function tour_corret_order=getTourStringFromIntegerProgrammTour(tour)
+
+    tour_corret_order = TSP_IntegerProgramm_findSubtours(ones(length(tour),1), tour, length(tour));
+    tour_corret_order{1} = [tour_corret_order{1}, 1];
+    tour_corret_order = tour_corret_order{1};
+    
+end
+
 

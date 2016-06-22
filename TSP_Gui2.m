@@ -129,6 +129,8 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 s = get(handles.popupmenu1, 'String');      
 set(handles.edit1, 'String', sprintf('%s!',s{get(handles.popupmenu1, 'Value')}));
 
+TSP_helper;
+
 switch (s{get(handles.popupmenu1, 'Value')})
     case 'Brute Force'
           [t, tl, p] = TSP_BruteForce(handles.matrix);
@@ -144,7 +146,17 @@ switch (s{get(handles.popupmenu1, 'Value')})
           set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
     
     case 'Integer Programming'
-        TSP_IntegerProgramm(app);
+        
+        [tour, tourlenght, processtime, solutiongab] = TSP_IntegerProgramm(handles.matrix);
+        tourString = getTourStringFromIntegerProgrammTour(tour);
+        
+        set(handles.text5, 'String', sprintf('Execution time: %f', processtime));
+        set(handles.text6, 'String', sprintf('Tour length: %f', tourlenght));
+        set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', tourString)));
+
+
+        drawTsp(tour, example3_coordinates, handles.axes1);
+         
 
     case 'Best Successor'
           [t, tl, p] = TSP_BestSuccessor(handles.matrix);
