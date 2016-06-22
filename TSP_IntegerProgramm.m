@@ -1,5 +1,28 @@
-function [ tour, tourlenght, processtime, message ] = tspOptLin(matrix)
+function [ tour, tourlenght, processtime, message ] = tspOptLin(matrix, guiOutput)
+%{ 
+Integer Programm - nearly exakt
 
+parameters:
+- matrix: cost matrix of a graph with n nodes
+
+returns:
+- tour: a valid tour
+- tourLength: length of the tour
+- processingTime: time for the calculation of the tour
+- message: stuts message 
+
+%}
+
+    if nargin == 2
+        % gui output enabled
+        temp = get(guiOutput, 'String');
+    else 
+        % no output 
+        temp = '';
+    end
+       
+
+    % start timer
     tic;
 
     % global defines 
@@ -115,7 +138,7 @@ function [ tour, tourlenght, processtime, message ] = tspOptLin(matrix)
             subtours = TSP_IntegerProgramm_findSubtours(result,edges,tour_length);
             subtour_length = length(subtours); 
             
-            fprintf('# of tours: %d\n',subtour_length);
+            fprintf('Remaining subtours: %d\n',subtour_length);
             
         end
 
@@ -132,19 +155,19 @@ function [ tour, tourlenght, processtime, message ] = tspOptLin(matrix)
         %     end
         % end
 
-        fprintf('\nLösungsqüte: \n');
+        fprintf('\Solution quality: \n');
         if (output.absolutegap == 0)
-            fprintf('\t Lösung ist optimal. Exitflag: %i \n', exitflag);
+            fprintf('\t Solution is optimal. Exitflag: %i \n', exitflag);
+        else 
+            fprintf('\t Solution is not optimal. Exitflag: %i \n', exitflag);
         end
-
+        
         tourlenght = distances'*result;
         message = output.absolutegap;
-        processtime = toc; %fprintf('%f sec.\n', toc);
+        processtime = toc; 
 
-        %fprintf('%f sec.\n', toc)
-        %app.labelExecutionTime.Text = sprintf('%fms', toc);
     else
-
+        % return valid data even if somethong goes wrong 
         tour = [];
         tourlenght = 0;
         solutiongab = 0;

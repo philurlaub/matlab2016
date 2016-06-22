@@ -99,6 +99,7 @@ parameters:
 %}
 function drawTsp(tour, coordinates, axes)
     hold on;
+    cla(axes);
     scatter(coordinates(:,1), coordinates(:,2), '*');
     labels = num2str((1:size(coordinates,1))','%d');    %'
     text(coordinates(:,1), coordinates(:,2), labels, 'horizontal','left', 'vertical','bottom')
