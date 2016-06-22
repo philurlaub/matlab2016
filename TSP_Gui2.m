@@ -182,6 +182,7 @@ switch (alg{get(handles.popupmenu1, 'Value')})
           set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
         
     case 'Christofides'
+      try
           [mst, oddEdges, t, tl, p] = TSP_Christofides(handles.matrix);
           
           if(tl == -1)
@@ -192,17 +193,65 @@ switch (alg{get(handles.popupmenu1, 'Value')})
           set(handles.text5, 'String', sprintf('Execution time: %f', p));
           set(handles.text6, 'String', sprintf('Tour length: %d', tl));
           set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
-          
+      catch ex
+          msgText = getReport(ex);
+          w = warndlg(msgText);
+      end
     case 'Opt2'
-          [t, tl, p] = TSP_2opt(handles.matrix);
-                 
+        
+           prompt = {'Enter Start Tour:'};
+           dlg_titel = 'Start Tour Input';
+           num_lines = 1;
+           input = inputdlg(prompt, dlg_titel, num_lines);
+           
+           if(~isempty(input{1}))
+              start = str2num(input{1});
+           else
+              start = TSP_BestSuccessor(handles.matrix);
+           end
+                     
+          [t, tl, p] = TSP_2opt(start, handles.matrix);
+          
+          cs = get(handles.edit1, 'String');
+          st = '';
+          if(tl == -1)
+              msg = 'Start tour includes to less or to much nodes!';
+              st = sprintf('Start Tour: %s\n\n%s', sprintf('%d ', start), msg);
+          else
+              st = sprintf('Start Tour: %s', sprintf('%d ', start));
+          end
+          set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, st));
+          
           set(handles.text5, 'String', sprintf('Execution time: %f', p));
           set(handles.text6, 'String', sprintf('Tour length: %d', tl));
           set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
           
     case 'Opt3'
-          [t, tl, p] = TSP_3opt(handles.matrix);
-                 
+        
+           prompt = {'Enter Start Tour:'};
+           dlg_titel = 'Start Tour Input';
+           num_lines = 1;
+           input = inputdlg(prompt, dlg_titel, num_lines);
+           
+           if(~isempty(input{1}))
+              start = str2num(input{1});
+           else
+              [start, a, c]  = TSP_BestSuccessor(handles.matrix);
+           end
+                    
+          [t, tl, p] = TSP_3opt(start, handles.matrix);
+          
+          cs = get(handles.edit1, 'String');
+          st = '';
+          if(tl == -1)
+              msg = 'Start tour includes to less or to much nodes!';
+              st = sprintf('Start Tour: %s\n\n%s', sprintf('%d ', start), msg);
+          else
+              st = sprintf('Start Tour: %s', sprintf('%d ', start));
+          end
+          set(handles.edit1, 'String', sprintf('%s \n\n%s', cs, st));
+          
+           
           set(handles.text5, 'String', sprintf('Execution time: %f', p));
           set(handles.text6, 'String', sprintf('Tour length: %d', tl));
           set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));

@@ -15,10 +15,19 @@ returns:
 
 % start measuring the processing time
 tic
-   
 
 %number of nodes
 n = size(matrix,1);
+
+% check if start solution has enough entries
+if(length(tour)-1 ~= n)
+    %disp('Start solution includes to less or to much nodes!');
+    tour = [];
+    tourLength = -1;
+    % stop measuring the processing time
+    processingTime = toc;
+    return;
+end
 
 newIteration = true;
 while(newIteration)
@@ -69,11 +78,9 @@ while(newIteration)
     end
 end
 
-tour = [tour(n) tour(1:n)];
-
 tourLength = 0;
 for(j=1:length(tour)-1)
-    tourLength = tourLength + matrix(tour(j), tour(j+1))
+    tourLength = tourLength + matrix(tour(j), tour(j+1));
 end
 
 % stop measuring the processing time

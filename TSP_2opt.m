@@ -16,6 +16,16 @@ returns:
 % start measuring the processing time
 tic
 
+% check if start solution has enough entries
+if(length(tour)-1 ~= n)
+    %disp('Start solution includes to less or to much nodes!');
+    tour = [];
+    tourLength = -1;
+    % stop measuring the processing time
+    processingTime = toc;
+    return;
+end
+
 newIteration = true;
 while(newIteration)
     newIteration = false;

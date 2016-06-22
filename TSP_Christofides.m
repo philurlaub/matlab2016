@@ -76,7 +76,7 @@ for(l=1:size(MSTedges, 1))
     nodeLevel(MSTedges(l, 2), MSTedges(l, 1)) = 1;
 end
 
-
+oddNodeLevel = 0;
 for(k=1:size(nodeLevel, 1))
     oneNodeLevel = sum(nodeLevel(k,:));
 	if(mod(oneNodeLevel,2) ~= 0)
