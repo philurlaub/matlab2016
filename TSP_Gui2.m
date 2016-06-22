@@ -206,6 +206,11 @@ switch (alg{get(handles.popupmenu1, 'Value')})
           set(handles.text5, 'String', sprintf('Execution time: %f', p));
           set(handles.text6, 'String', sprintf('Tour length: %d', tl));
           set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
+          
+    case 'Run All'
+          TSP_RunAll(handles.matrix, handles.edit1, handles.axes1);
+          
+        
     otherwise
         printToGui(app, 'Error: please select a algorithm!');
 end
