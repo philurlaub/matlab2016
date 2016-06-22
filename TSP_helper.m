@@ -38,20 +38,27 @@ isValid = true;
         for j = 1:size(matrix, 2)
             if i==j && matrix(i,j) ~= 0
                 isValid = false;
-                message = 'Only zeors are allowed on matrix diagonale.'
+                message = 'Only zeors are allowed on matrix diagonale.';
+                break;
             elseif matrix(i,j )~= matrix(j,i)
                 isValid = false;
-                message = 'Matrix is not symmetric.'
+                message = 'Matrix is not symmetric.';
+                break;
             elseif matrix(i,j)<0
                 isValid = false;
-                message = 'Negative values are not allowed.'
+                message = 'Negative values are not allowed.';
+                break;
             else
-                message = 'Matrix is valid.'
+                message = 'Matrix is valid.';
             end
         end
+        
+        if(~isValid)
+            break;
+        end
     end
-
 end
+
 
 %{
 

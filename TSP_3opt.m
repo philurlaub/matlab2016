@@ -1,4 +1,4 @@
-function [ tour, tourLength] = threeOpt( tour, matrix )
+function [ tour, tourLength, processingTime] = threeOpt( tour, matrix )
 %{ 
 3 opt - heuristic (improving method)
 
@@ -9,8 +9,13 @@ parameters:
 returns:
 - tour: a 3-opt tour
 - tourLength: length of the 3-opt tour
+- processingTime: time for the calculation of the tour
 
-%}   
+%}
+
+% start measuring the processing time
+tic
+   
 
 %number of nodes
 n = size(matrix,1);
@@ -70,6 +75,9 @@ tourLength = 0;
 for(j=1:length(tour)-1)
     tourLength = tourLength + matrix(tour(j), tour(j+1))
 end
+
+% stop measuring the processing time
+processingTime = toc;
 
 end
 

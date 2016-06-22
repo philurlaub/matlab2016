@@ -109,7 +109,10 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-openvar(handles.matrix);
+[FileName,PathName] = uigetfile('*.mat','Select the mat-file');
+file = load(FileName)
+handles.matrix = cell2mat(struct2cell(file))
+set(handles.edit1, 'String', 'Data input finished!');
 guidata(hObject, handles);
 
 
@@ -119,19 +122,26 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+f = figure;
+t = uitable(f, 'Data', handles.matrix);
+guidata(hObject, handles);
 
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-s = get(handles.popupmenu1, 'String');      
-set(handles.edit1, 'String', sprintf('%s!',s{get(handles.popupmenu1, 'Value')}));
-
 TSP_helper;
+alg = get(handles.popupmenu1, 'String'); 
 
-switch (s{get(handles.popupmenu1, 'Value')})
+[valid, msg] = checkMatrix(handles.matrix);
+if(valid)
+    set(handles.edit1, 'String', sprintf('%s!',alg{get(handles.popupmenu1, 'Value')}));
+else
+    set(handles.edit1, 'String', sprintf('%s!\n\n%s',alg{get(handles.popupmenu1, 'Value')}, msg));
+end
+
+switch (alg{get(handles.popupmenu1, 'Value')})
     case 'Brute Force'
           [t, tl, p] = TSP_BruteForce(handles.matrix);
                  
