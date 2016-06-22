@@ -137,13 +137,6 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-try
-
-if(isempty(handles.matrix) || isempty(handles.coordinates))
-    warndlg('The Matrix and/or the Coordinates are missing!');
-    return;
-end
-
 TSP_helper;
 alg = get(handles.popupmenu1, 'String'); 
 
@@ -248,16 +241,8 @@ switch (alg{get(handles.popupmenu1, 'Value')})
               
               %output
               text = get(handles.edit1, 'String');
-              mstString = '';
-              for(i = 1:length(mst))
-                mstString = sprintf('%s\n%d,%d', mstString,mst(i,1), mst(i,2));
-              end
-              
-              edges = '';
-              for(i = 1:length(oddEdges))
-                edges = sprintf('%s\n%d,%d', edges,oddEdges(i,1), oddEdges(i,2));
-              end
-              set(handles.edit1, 'String', sprintf('%s \n\nMST:%s\n\noddLevel:%s', text, mstString, edges));
+              mst = sprintf(;
+              set(handles.edit1, 'String', sprintf('%s \n\n%s\n%s', text, mst, edges));
               
               set(handles.text5, 'String', sprintf('Execution time: %f', p));
               set(handles.text6, 'String', sprintf('Tour length: %d', tl));
@@ -373,9 +358,6 @@ switch (alg{get(handles.popupmenu1, 'Value')})
         
     otherwise
         printToGui(app, 'Error: please select a algorithm!');
-end
-catch
-    warndlg('An Exception occured!');
 end
 guidata(hObject, handles);
 
