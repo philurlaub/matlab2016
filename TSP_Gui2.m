@@ -129,7 +129,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 f = figure;
-t = uitable(f, 'Data', handles.matrix);
+t = uitable(f,'unit','normalized', 'Position',[0 0 1 1], 'Data', handles.matrix);
 guidata(hObject, handles);
 
 % --- Executes on button press in pushbutton3.
@@ -173,7 +173,7 @@ switch (alg{get(handles.popupmenu1, 'Value')})
 
               %output
               set(handles.text5, 'String', sprintf('Execution time: %f', p));
-              set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+              set(handles.text6, 'String', sprintf('Tour length: %f', tl));
               set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
 
               % draw Tour
@@ -192,15 +192,20 @@ switch (alg{get(handles.popupmenu1, 'Value')})
             set(handles.edit1, 'String', sprintf('%s \n\n%s', text, errorMsg));
         end
     case 'Integer Programming'
-         cla(handles.axes1);
-        [tour, tourlenght, processtime, solutiongab] = TSP_IntegerProgramm(handles.matrix);
+         
+        % reset axes
+        cla(handles.axes1);
+        
+        % run algorithm
+        [tour, tourlenght, processtime, solutiongab] = TSP_IntegerProgramm(handles.matrix, handles.edit1);
         tourString = getTourStringFromIntegerProgrammTour(tour);
         
+        % output
         set(handles.text5, 'String', sprintf('Execution time: %f', processtime));
         set(handles.text6, 'String', sprintf('Tour length: %f', tourlenght));
         set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', tourString)));
 
-
+        % draw tour
         drawTsp(tour, handles.coordinates, handles.axes1);
          
 
@@ -219,7 +224,7 @@ switch (alg{get(handles.popupmenu1, 'Value')})
           
           %output
           set(handles.text5, 'String', sprintf('Execution time: %f', p));
-          set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+          set(handles.text6, 'String', sprintf('Tour length: %f', tl));
           set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
         
           % draw Tour
@@ -260,7 +265,7 @@ switch (alg{get(handles.popupmenu1, 'Value')})
               set(handles.edit1, 'String', sprintf('%s \n\nMST:%s\n\noddLevel:%s', text, mstString, edges));
               
               set(handles.text5, 'String', sprintf('Execution time: %f', p));
-              set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+              set(handles.text6, 'String', sprintf('Tour length: %f', tl));
               set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
               
               % draw Tour
@@ -313,7 +318,7 @@ switch (alg{get(handles.popupmenu1, 'Value')})
 
       % output
       set(handles.text5, 'String', sprintf('Execution time: %f', p));
-      set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+      set(handles.text6, 'String', sprintf('Tour length: %f', tl));
       set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
 
       % draw Tour
@@ -357,7 +362,7 @@ switch (alg{get(handles.popupmenu1, 'Value')})
 
       % output
       set(handles.text5, 'String', sprintf('Execution time: %f', p));
-      set(handles.text6, 'String', sprintf('Tour length: %d', tl));
+      set(handles.text6, 'String', sprintf('Tour length: %f', tl));
       set(handles.text7, 'String', sprintf('Tour: %s', sprintf('%d ', t)));
 
       % draw Tour

@@ -15,10 +15,10 @@ returns:
 
     if nargin == 2
         % gui output enabled
-        temp = get(guiOutput, 'String');
+        guimsg = get(guiOutput, 'String');
     else 
         % no output 
-        temp = '';
+        guimsg = '';
     end
        
 
@@ -106,7 +106,8 @@ returns:
         subtours = TSP_IntegerProgramm_findSubtours(result,edges,tour_length);
         subtour_length = length(subtours);
         
-        fprintf('Remaining subtours: %d\n',subtour_length);
+        fprintf('\n#############################\nRemaining subtours: %d\n',subtour_length);
+        guimsg = sprintf('%s\n#############################\nRemaining subtours: %d\n', guimsg, subtour_length);
 
         A = [];
         b = [];
@@ -134,32 +135,32 @@ returns:
             % run optimization again 
             [result,unused,exitflag,output] = intlinprog(distances,intcon,A,b,Aeq,beq,lb,ub,opts);
 
+
             % recheck
             subtours = TSP_IntegerProgramm_findSubtours(result,edges,tour_length);
             subtour_length = length(subtours); 
             
             fprintf('Remaining subtours: %d\n',subtour_length);
+            guimsg = sprintf('%s\nRemaining subtours: %d\n', guimsg, subtour_length);
+            if nargin==2 
+                set(guiOutput, 'String', guimsg);
+            end
             
         end
 
         tour =  edges(find(result),:);
 
-        % % return the tour in output matrix tour
-        % tour = []; %spalloc(size(matrix, 1), 2, 2*size(matrix, 1));
-        % row = 1;
-        % for i = 1:size(result, 1)
-        %     if result(i) == 1
-        %         tour(row,:) = [edges(i, 1), edges(i, 2)];
-        %         row = row+1;
-        %         %fprintf(' %i -> %i \n', edges(i, 1), edges(i,2));
-        %     end
-        % end
-
-        fprintf('\Solution quality: \n');
+        fprintf('\nSolution quality: \n');
+        guimsg = sprintf('%s\nSolution quality: \n', guimsg);
         if (output.absolutegap == 0)
             fprintf('\t Solution is optimal. Exitflag: %i \n', exitflag);
+            guimsg = sprintf('%s\n\t Solution is optimal. Exitflag: %i \n', guimsg, output.absolutegap);
         else 
             fprintf('\t Solution is not optimal. Exitflag: %i \n', exitflag);
+            guimsg = sprintf('%s\n\t Solution is not optimal. Exitflag: %i \n', guimsg, output.absolutegap);
+        end
+        if nargin==2 
+            set(guiOutput, 'String', guimsg);
         end
         
         tourlenght = distances'*result;
